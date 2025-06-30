@@ -1,0 +1,178 @@
+# CLV Prediction Model Configuration
+# This file contains all configuration parameters for the CLV prediction pipeline
+
+# Data Configuration
+data:
+  raw_data_path: "data/raw/"
+  processed_data_path: "data/processed/"
+  feature_matrix_file: "feature_matrix.csv"
+  test_size: 0.2
+  random_state: 42
+
+# Feature Engineering
+feature_engineering:
+  prediction_horizon_days: 365
+  feature_selection_k: 50
+  enable_feature_selection: true
+  categorical_encoding: "label"  # options: label, onehot, target
+
+# Model Training
+training:
+  models_to_train:
+    - "linear_regression"
+    - "ridge"
+    - "lasso"
+    - "elastic_net"
+    - "random_forest"
+    - "gradient_boosting"
+    - "xgboost"
+    - "lightgbm"
+  
+  hyperparameter_optimization:
+    n_trials: 100
+    optimization_timeout: 3600  # seconds
+    enable_pruning: true
+  
+  cross_validation:
+    cv_folds: 5
+    scoring: "neg_mean_squared_error"
+  
+  ensemble:
+    enable_ensemble: true
+    ensemble_methods: ["simple_average", "weighted_average"]
+
+# Model Parameters
+model_params:
+  xgboost:
+    objective: "reg:squarederror"
+    eval_metric: "rmse"
+    early_stopping_rounds: 50
+    verbose: false
+  
+  lightgbm:
+    objective: "regression"
+    metric: "rmse"
+    verbose: -1
+    early_stopping_rounds: 50
+  
+  random_forest:
+    n_estimators: 200
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+  
+  gradient_boosting:
+    n_estimators: 200
+    max_depth: 6
+    learning_rate: 0.1
+
+# Evaluation Metrics
+evaluation:
+  primary_metric: "rmse"
+  additional_metrics:
+    - "mae"
+    - "r2"
+    - "mape"
+  
+  business_metrics:
+    - "clv_accuracy_by_segment"
+    - "revenue_prediction_error"
+    - "customer_ranking_correlation"
+
+# Feature Importance
+feature_importance:
+  enable_shap: true
+  shap_sample_size: 1000
+  enable_permutation_importance: true
+  plot_top_features: 20
+
+# MLOps
+mlops:
+  model_versioning: true
+  experiment_tracking: false  # Set to true if using MLflow
+  model_registry: false
+  automated_retraining: false
+  
+  monitoring:
+    data_drift_detection: true
+    model_performance_monitoring: true
+    alert_thresholds:
+      rmse_degradation: 0.1  # 10% increase in RMSE
+      prediction_drift: 0.05  # 5% drift in predictions
+
+# Dashboard Configuration
+dashboard:
+  title: "CLV Analytics Dashboard"
+  theme: "light"
+  cache_data: true
+  auto_refresh: false
+  
+  visualizations:
+    enable_plotly: true
+    enable_matplotlib: true
+    color_scheme: "blues"
+  
+  business_kpis:
+    - "total_clv"
+    - "average_clv_by_segment"
+    - "customer_acquisition_cost"
+    - "customer_retention_rate"
+    - "marketing_roi"
+
+# Logging
+logging:
+  level: "INFO"
+  log_file: "logs/clv_pipeline.log"
+  enable_file_logging: true
+  enable_console_logging: true
+  
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  max_file_size: "10MB"
+  backup_count: 5
+
+# Performance
+performance:
+  parallel_processing: true
+  n_jobs: -1  # Use all available cores
+  memory_optimization: true
+  batch_processing: false
+  batch_size: 1000
+
+# Security
+security:
+  data_anonymization: true
+  pii_removal: true
+  secure_model_storage: false
+  access_control: false
+
+# Deployment
+deployment:
+  environment: "development"  # options: development, staging, production
+  api_endpoint: "http://localhost:8000"
+  model_serving: "local"  # options: local, cloud, docker
+  
+  scaling:
+    auto_scaling: false
+    min_instances: 1
+    max_instances: 5
+    cpu_threshold: 0.8
+    memory_threshold: 0.8
+
+# Business Rules
+business_rules:
+  min_clv_threshold: 0.0
+  max_clv_threshold: 10000.0
+  segment_thresholds:
+    high_value: 500.0
+    medium_value: 150.0
+    low_value: 50.0
+  
+  campaign_targeting:
+    high_value_response_rate: 0.25
+    medium_value_response_rate: 0.15
+    low_value_response_rate: 0.08
+  
+  churn_prediction:
+    recency_threshold_days: 180
+    frequency_threshold: 2
+    monetary_threshold: 100.0
